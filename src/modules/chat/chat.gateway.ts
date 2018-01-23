@@ -14,7 +14,7 @@ import 'rxjs/add/operator/map';
 import { JwtService } from '../auth/jwt/jwt.service';
 import { User } from '../users/interfaces/user.interface';
 
-@WebSocketGateway({ port: 1080, namespace: 'messages' })
+@WebSocketGateway({ port: 1080, namespace: 'rooms',  })
 export class ChatGateway implements OnGatewayConnection {
   @WebSocketServer() server;
 
@@ -35,6 +35,31 @@ export class ChatGateway implements OnGatewayConnection {
     console.log(data);
 
     client.broadcast.emit('newMessage', data);
+
+    return Observable.create(observer => observer.next({ event, data }));
+  }
+
+  @SubscribeMessage('room/join/:id')
+  onRoomConnection(client, data): void {
+    const room = client.handshake.query.room;
+
+    client.join(room);
+  }
+
+  @SubscribeMessage('room/leave/:id')
+  onRoomLeave(client, data): void {
+    const room = client.handshake.query.room;
+
+    client.leave(room);
+  }
+
+  @SubscribeMessage('room/:id')
+  onMessageRoom(client, data): Observable<WsResponse<string>> {
+    const room = client.handshake.query.room;
+    const event = `message/${client.room.id}`;
+    console.log(data);
+
+    client.to(room).emit(data);
 
     return Observable.create(observer => observer.next({ event, data }));
   }
