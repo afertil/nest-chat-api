@@ -9,10 +9,10 @@ import { AuthMiddleware } from '../common/middlewares/auth.middleware';
 @Module({
   imports: [MongooseModule.forFeature([{ name: 'Room', schema: RoomSchema }])],
   controllers: [RoomsController],
-  components: [RoomsService]
+  components: [RoomsService],
 })
-export class UsersModule {
-  public configure(consumer: MiddlewaresConsumer) {
-    // consumer.apply(AuthMiddleware).forRoutes(UsersController);
-  }
+export class RoomsModule {
+  // public configure(consumer: MiddlewaresConsumer) {
+  //   consumer.apply(AuthMiddleware).forRoutes(RoomsController);
+  // }
 }

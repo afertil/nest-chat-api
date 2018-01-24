@@ -4,23 +4,22 @@ import {
   Post,
   Delete,
   Body,
-  Param,
   Request,
   HttpException,
   HttpStatus,
-  Put
+  Put,
 } from '@nestjs/common';
 
 import { RoomsService } from './rooms.service';
 import { Room } from './interfaces/room.interface';
 
-@Controller('users')
-export class UsersController {
-  constructor(private readonly RoomsService: RoomsService) {}
+@Controller('rooms')
+export class RoomsController {
+  constructor(private readonly roomsService: RoomsService) {}
 
   @Get()
   async index(): Promise<Room[]> {
-    return await this.RoomsService.findAll();
+    return await this.roomsService.findAll();
   }
 
   @Get(':id')
@@ -29,25 +28,27 @@ export class UsersController {
     if (!id)
       throw new HttpException(
         'ID parameter is missing',
-        HttpStatus.BAD_REQUEST
+        HttpStatus.BAD_REQUEST,
       );
 
-    const user = await this.RoomsService.findById(id);
-    if (!user)
+    const room = await this.roomsService.findById(id);
+    if (!room)
       throw new HttpException(
-        `The user with the id: ${id} does not exists`,
-        HttpStatus.BAD_REQUEST
+        `The room with the id: ${id} does not exists`,
+        HttpStatus.BAD_REQUEST,
       );
 
-    return user;
+    return room;
   }
 
   @Post()
-  async create(@Body() body) {
+  async create(@Body() body: Room): Promise<Room> {
     if (!body || (body && Object.keys(body).length === 0))
       throw new HttpException('Missing informations', HttpStatus.BAD_REQUEST);
 
-    await this.RoomsService.create(body);
+    const room = await this.roomsService.create(body);
+
+    return room;
   }
 
   @Put(':id')
@@ -56,10 +57,10 @@ export class UsersController {
     if (!id)
       throw new HttpException(
         'ID parameter is missing',
-        HttpStatus.BAD_REQUEST
+        HttpStatus.BAD_REQUEST,
       );
 
-    await this.RoomsService.update(id, req.body);
+    await this.roomsService.update(id, req.body);
   }
 
   @Delete(':id')
@@ -68,9 +69,9 @@ export class UsersController {
     if (!id)
       throw new HttpException(
         'ID parameter is missing',
-        HttpStatus.BAD_REQUEST
+        HttpStatus.BAD_REQUEST,
       );
 
-    await this.RoomsService.delete(id);
+    await this.roomsService.delete(id);
   }
 }
