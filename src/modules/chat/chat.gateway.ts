@@ -4,7 +4,7 @@ import {
   WsResponse,
   WebSocketServer,
   WsException,
-  OnGatewayConnection
+  OnGatewayConnection,
 } from '@nestjs/websockets';
 import * as WebSocket from 'ws';
 import { Observable } from 'rxjs/Observable';
@@ -14,7 +14,7 @@ import 'rxjs/add/operator/map';
 import { JwtService } from '../auth/jwt/jwt.service';
 import { User } from '../users/interfaces/user.interface';
 
-@WebSocketGateway({ port: 1080, namespace: 'rooms',  })
+@WebSocketGateway({ port: 1080, namespace: 'rooms' })
 export class ChatGateway implements OnGatewayConnection {
   @WebSocketServer() server;
 
@@ -23,8 +23,11 @@ export class ChatGateway implements OnGatewayConnection {
   async handleConnection(socket) {
     const user: User = await this.jwtService.verify(
       socket.handshake.query.token,
-      true
+      true,
     );
+
+    console.log(socket.handshake.query.room);
+    socket.join(socket.handshake.query.room);
 
     socket.broadcast.emit('userConnected', user);
   }
@@ -39,21 +42,21 @@ export class ChatGateway implements OnGatewayConnection {
     return Observable.create(observer => observer.next({ event, data }));
   }
 
-  @SubscribeMessage('room/join/:id')
+  @SubscribeMessage('messages/join/:id')
   onRoomConnection(client, data): void {
     const room = client.handshake.query.room;
 
     client.join(room);
   }
 
-  @SubscribeMessage('room/leave/:id')
+  @SubscribeMessage('messages/leave/:id')
   onRoomLeave(client, data): void {
     const room = client.handshake.query.room;
 
     client.leave(room);
   }
 
-  @SubscribeMessage('room/:id')
+  @SubscribeMessage('messages/:id')
   onMessageRoom(client, data): Observable<WsResponse<string>> {
     const room = client.handshake.query.room;
     const event = `message/${client.room.id}`;
