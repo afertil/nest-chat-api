@@ -48,6 +48,8 @@ console.log(messages);
 
     client.broadcast.to(room).emit('message', data);
 
+    this.roomService.addMessage(data, room);
+
     return Observable.create(observer => observer.next({ event, data }));
   }
 
