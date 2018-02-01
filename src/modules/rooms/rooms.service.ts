@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 
 import { Room } from './interfaces/room.interface';
 import { RoomSchema } from './schemas/room.schema';
+import { Message } from './interfaces/message.interface';
 
 @Component()
 export class RoomsService {
@@ -14,6 +15,17 @@ export class RoomsService {
   async create(room: Room): Promise<Room> {
     const createdRoom = new this.roomModel(room);
     return await createdRoom.save();
+  }
+
+  async addMessage(message: Message, id: string) {
+    const room = await this.findById(id);
+    room.messages.push(message);
+    return await room.save();
+  }
+
+  async findMessages(id: string, limit: number) {
+    const room = await this.findById(id); // TODO: use findOne()
+    return room.messages;
   }
 
   async findAll(options?: any): Promise<Room[]> {

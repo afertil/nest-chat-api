@@ -10,6 +10,7 @@ import { AuthMiddleware } from '../common/middlewares/auth.middleware';
   imports: [MongooseModule.forFeature([{ name: 'Room', schema: RoomSchema }])],
   controllers: [RoomsController],
   components: [RoomsService],
+  exports: [RoomsService],
 })
 export class RoomsModule {
   // public configure(consumer: MiddlewaresConsumer) {

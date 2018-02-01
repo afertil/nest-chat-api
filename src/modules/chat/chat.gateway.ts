@@ -14,21 +14,25 @@ import 'rxjs/add/operator/map';
 
 import { JwtService } from '../auth/jwt/jwt.service';
 import { User } from '../users/interfaces/user.interface';
+import { RoomsService } from '../rooms/rooms.service';
 
 @WebSocketGateway({ port: 1080, namespace: 'rooms' })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server;
 
-  constructor(private jwtService: JwtService) {}
+  constructor(private jwtService: JwtService, private roomService: RoomsService) {}
 
   async handleConnection(socket) {
+    const roomId = socket.handshake.query.room;
     const user: User = await this.jwtService.verify(
       socket.handshake.query.token,
       true,
     );
 
-    socket.join(socket.handshake.query.room);
+    socket.join();
 
+    const messages = await this.roomService.findMessages(roomId, 25);
+console.log(messages);
     socket.broadcast.emit('userConnected', user);
   }
 
