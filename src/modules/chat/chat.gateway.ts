@@ -5,7 +5,7 @@ import {
   WebSocketServer,
   WsException,
   OnGatewayConnection,
-  OnGatewayDisconnect,
+  OnGatewayDisconnect
 } from '@nestjs/websockets';
 import * as WebSocket from 'ws';
 import { Observable } from 'rxjs/Observable';
@@ -20,20 +20,26 @@ import { RoomsService } from '../rooms/rooms.service';
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server;
 
-  constructor(private jwtService: JwtService, private roomService: RoomsService) {}
+  constructor(
+    private jwtService: JwtService,
+    private roomService: RoomsService
+  ) {}
 
   async handleConnection(socket) {
     const roomId = socket.handshake.query.room;
     const user: User = await this.jwtService.verify(
       socket.handshake.query.token,
-      true,
+      true
     );
 
-    socket.join();
+    socket.join(roomId);
 
     const messages = await this.roomService.findMessages(roomId, 25);
-console.log(messages);
-    socket.broadcast.emit('userConnected', user);
+
+    // Send last messages to the connected user
+    socket.emit('message', messages);
+
+    // socket.broadcast.emit('userConnected', user);
   }
 
   async handleDisconnect(socket) {
@@ -63,7 +69,7 @@ console.log(messages);
   @SubscribeMessage('leave')
   onRoomLeave(client, data): void {
     const room = client.handshake.query.room;
-console.log('leave', room);
+    console.log('leave', room);
     client.leave(room);
   }
 

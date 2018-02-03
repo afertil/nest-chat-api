@@ -9,7 +9,7 @@ import { Message } from './interfaces/message.interface';
 @Component()
 export class RoomsService {
   constructor(
-    @InjectModel(RoomSchema) private readonly roomModel: Model<Room>,
+    @InjectModel(RoomSchema) private readonly roomModel: Model<Room>
   ) {}
 
   async create(room: Room): Promise<Room> {
@@ -19,17 +19,27 @@ export class RoomsService {
 
   async addMessage(message: Message, id: string) {
     const room = await this.findById(id);
+    message.user = message.user._id;
     room.messages.push(message);
+
     return await room.save();
   }
 
   async findMessages(id: string, limit: number) {
-    const room = await this.findById(id); // TODO: use findOne()
+    const room = await this.findWithLimit(id, limit);
     return room.messages;
   }
 
   async findAll(options?: any): Promise<Room[]> {
     return await this.roomModel.find(options).exec();
+  }
+
+  async findWithLimit(id: string, limit: number): Promise<Room | null> {
+    return await this.roomModel
+      .findById(id)
+      .slice('messages', limit)
+      .populate('messages.user', { _id: 1, username: 1, email: 1 })
+      .exec();
   }
 
   async findById(id: string): Promise<Room | null> {
