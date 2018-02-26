@@ -8,6 +8,7 @@ import {
   OnGatewayDisconnect
 } from '@nestjs/websockets';
 import * as WebSocket from 'ws';
+import * as io from 'socket.io';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/from';
 import 'rxjs/add/operator/map';
@@ -20,10 +21,12 @@ import { RoomsService } from '../rooms/rooms.service';
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server;
 
+  connectedUsers: string[] = [];
+
   constructor(
     private jwtService: JwtService,
     private roomService: RoomsService
-  ) {}
+  ) { }
 
   async handleConnection(socket) {
     const roomId = socket.handshake.query.room;
@@ -34,6 +37,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     socket.join(roomId);
 
+    this.connectedUsers = [... this.connectedUsers, String(user._id)];
+
     const messages = await this.roomService.findMessages(roomId, 25);
 
     // Send last messages to the connected user
@@ -43,8 +48,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   async handleDisconnect(socket) {
-    const room = socket.handshake.query.room;
-    socket.leave(room);
+    const roomId = socket.handshake.query.room;
+    const user: User = await this.jwtService.verify(
+      socket.handshake.query.token,
+      true
+    );
+    const userPos = this.connectedUsers.indexOf(String(user._id));
+
+    socket.leave(roomId);
+    if (userPos > -1) {
+      this.connectedUsers = [...this.connectedUsers.slice(0, userPos), ...this.connectedUsers.slice(userPos + 1)]
+    }
   }
 
   @SubscribeMessage('message')
