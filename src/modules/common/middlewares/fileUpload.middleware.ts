@@ -1,12 +1,12 @@
-import { Middleware, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import {
   NestMiddleware,
-  ExpressMiddleware
+  MiddlewareFunction
 } from '@nestjs/common/interfaces/middlewares';
 import * as multer from 'multer';
 import * as path from 'path';
 
-@Middleware()
+@Injectable()
 export class FileUploadMiddleware implements NestMiddleware {
   resolve() {
     return (req, res, next) => {

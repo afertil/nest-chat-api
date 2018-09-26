@@ -12,6 +12,6 @@ import { RoomsService } from '../rooms/rooms.service';
 
 @Module({
   imports: [AuthModule, RoomsModule],
-  components: [ChatGateway],
+  providers: [ChatGateway],
 })
 export class ChatModule {}

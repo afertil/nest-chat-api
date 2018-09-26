@@ -1,4 +1,4 @@
-import { Component, HttpStatus, HttpException, Inject } from '@nestjs/common';
+import { Injectable, HttpStatus, HttpException, Inject } from '@nestjs/common';
 import { Model } from 'mongoose';
 import * as jwt from 'jsonwebtoken';
 
@@ -6,7 +6,7 @@ import { UsersService } from './../users/users.service';
 import { User } from '../users/interfaces/user.interface';
 import { JwtService } from './jwt/jwt.service';
 
-@Component()
+@Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,

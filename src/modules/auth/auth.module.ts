@@ -12,7 +12,7 @@ import { AuthController } from './auth.controller';
 
 @Module({
   imports: [UsersModule],
-  components: [AuthService, JwtService],
+  providers: [AuthService, JwtService],
   controllers: [AuthController],
   exports: [JwtService]
 })

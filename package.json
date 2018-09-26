@@ -10,31 +10,33 @@
     "start:prod": "node dist/main.js"
   },
   "dependencies": {
-    "@nestjs/common": "^4.5.0",
-    "@nestjs/core": "^4.5.0",
-    "@nestjs/microservices": "^4.5.0",
-    "@nestjs/mongoose": "^2.0.0",
-    "@nestjs/testing": "^4.5.0",
-    "@nestjs/websockets": "^4.5.0",
-    "compression": "^1.7.1",
+    "@nestjs/common": "^5.3.9",
+    "@nestjs/core": "^5.3.10",
+    "@nestjs/jwt": "^0.2.0",
+    "@nestjs/mongoose": "^5.2.2",
+    "@nestjs/testing": "^5.3.8",
+    "@nestjs/websockets": "^5.3.8",
+    "compression": "^1.7.3",
     "cors": "^2.8.4",
-    "helmet": "^3.9.0",
-    "jsonwebtoken": "^8.1.0",
+    "helmet": "^3.13.0",
+    "jsonwebtoken": "^8.3.0",
     "mongoose": "^4.13.6",
-    "redis": "^2.7.1",
-    "reflect-metadata": "^0.1.10",
-    "rxjs": "^5.4.3",
-    "typescript": "^2.6.2"
+    "passport-jwt": "^4.0.0",
+    "redis": "^2.8.0",
+    "reflect-metadata": "^0.1.12",
+    "rxjs": "^6.3.3",
+    "rxjs-compat": "^6.3.3",
+    "typescript": "^2.9.2"
   },
   "devDependencies": {
-    "@types/body-parser": "^1.16.4",
-    "@types/compression": "0.0.33",
-    "@types/cors": "^2.8.1",
-    "@types/helmet": "0.0.36",
+    "@types/body-parser": "^1.17.0",
+    "@types/compression": "0.0.36",
+    "@types/cors": "^2.8.4",
+    "@types/helmet": "0.0.42",
     "@types/mongoose": "^4.7.28",
     "@types/node": "^8.0.28",
-    "@types/ws": "^3.0.2",
-    "nodemon": "^1.12.1",
-    "ts-node": "^3.3.0"
+    "@types/ws": "^6.0.1",
+    "nodemon": "^1.18.4",
+    "ts-node": "^7.0.1"
   }
 }
