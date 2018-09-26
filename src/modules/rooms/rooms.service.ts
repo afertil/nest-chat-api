@@ -1,15 +1,14 @@
-import { Component } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 import { Room } from './interfaces/room.interface';
-import { RoomSchema } from './schemas/room.schema';
 import { Message } from './interfaces/message.interface';
 
-@Component()
+@Injectable()
 export class RoomsService {
   constructor(
-    @InjectModel(RoomSchema) private readonly roomModel: Model<Room>
+    @InjectModel('Room') private readonly roomModel: Model<Room>
   ) {}
 
   async create(room: Room): Promise<Room> {

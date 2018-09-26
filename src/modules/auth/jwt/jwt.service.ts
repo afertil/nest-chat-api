@@ -1,4 +1,4 @@
-import { Component, HttpStatus, HttpException } from '@nestjs/common';
+import { Injectable, HttpStatus, HttpException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import * as jwt from 'jsonwebtoken';
 import * as os from 'os';
@@ -8,7 +8,7 @@ import { User } from '../../users/interfaces/user.interface';
 import { UsersService } from './../../users/users.service';
 import { WsException } from '@nestjs/websockets';
 
-@Component()
+@Injectable()
 export class JwtService {
   constructor(private readonly usersService: UsersService) {}
 
@@ -45,7 +45,7 @@ export class JwtService {
    */
   async verify(token: string, isWs: boolean = false): Promise<User | null> {
     try {
-      const payload = jwt.verify(token, APP_CONFIG.jwtSecret);
+      const payload = <any>jwt.verify(token, APP_CONFIG.jwtSecret);
       const user = await this.usersService.findById(payload.sub._id);
 
       if (!user) {

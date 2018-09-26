@@ -9,7 +9,7 @@ import {
 } from '@nestjs/websockets';
 import * as WebSocket from 'ws';
 import * as io from 'socket.io';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import 'rxjs/add/observable/from';
 import 'rxjs/add/operator/map';
 
@@ -29,7 +29,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) { }
 
   async handleConnection(socket) {
+    console.log(socket);
     const roomId = socket.handshake.query.room;
+    console.log('room id', roomId);
     const user: User = await this.jwtService.verify(
       socket.handshake.query.token,
       true
@@ -76,7 +78,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('join')
   onRoomConnection(client, data): void {
     const room = client.handshake.query.room;
-
+    console.log('join', room);
     client.join(room);
   }
 

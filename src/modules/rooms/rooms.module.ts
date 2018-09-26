@@ -1,4 +1,4 @@
-import { Module, RequestMethod, MiddlewaresConsumer } from '@nestjs/common';
+import { Module, RequestMethod, MiddlewareConsumer } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
 import { RoomsController } from './rooms.controller';
@@ -9,11 +9,11 @@ import { AuthMiddleware } from '../common/middlewares/auth.middleware';
 @Module({
   imports: [MongooseModule.forFeature([{ name: 'Room', schema: RoomSchema }])],
   controllers: [RoomsController],
-  components: [RoomsService],
+  providers: [RoomsService],
   exports: [RoomsService],
 })
 export class RoomsModule {
-  // public configure(consumer: MiddlewaresConsumer) {
+  // public configure(consumer: MiddlewareConsumer) {
   //   consumer.apply(AuthMiddleware).forRoutes(RoomsController);
   // }
 }

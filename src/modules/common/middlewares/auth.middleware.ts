@@ -1,5 +1,5 @@
 import {
-  Middleware,
+  Injectable,
   NestMiddleware,
   HttpException,
   HttpStatus
@@ -11,7 +11,7 @@ import { APP_CONFIG } from '../../../config';
 import { JwtService } from '../../auth/jwt/jwt.service';
 import { User } from '../../users/interfaces/user.interface';
 
-@Middleware()
+@Injectable()
 export class AuthMiddleware implements NestMiddleware {
   constructor(private readonly jwtService: JwtService) {}
 
