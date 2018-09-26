@@ -26,7 +26,14 @@ export class RoomsService {
   }
 
   async findMessages(id: string, limit: number) {
-    const room = await this.findWithLimit(id, limit);
+    let room = await this.findWithLimit(id, limit);
+
+    // Create the user room, if isn't already exist
+    if (!room) {
+      const userRoom = new this.roomModel({ _id: id, name: id, is_user: true });
+      room = await this.create(userRoom);
+    }
+    console.log(room);
     return room.messages;
   }
 
