@@ -17,7 +17,7 @@ import { JwtService } from '../auth/jwt/jwt.service';
 import { User } from '../users/interfaces/user.interface';
 import { RoomsService } from '../rooms/rooms.service';
 
-@WebSocketGateway({ port: 1080, namespace: 'rooms' })
+@WebSocketGateway(1080, { namespace: 'rooms' })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server;
 
@@ -29,9 +29,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) { }
 
   async handleConnection(socket) {
-    console.log(socket);
     const roomId = socket.handshake.query.room;
-    console.log('room id', roomId);
     const user: User = await this.jwtService.verify(
       socket.handshake.query.token,
       true
