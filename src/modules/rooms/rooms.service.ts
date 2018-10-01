@@ -56,11 +56,11 @@ export class RoomsService {
     return await this.roomModel.findOne(options, fields).exec();
   }
 
-  async update(id: number, newValue: Room): Promise<Room | null> {
+  async update(id: string, newValue: Room): Promise<Room | null> {
     return await this.roomModel.findByIdAndUpdate(id, newValue).exec();
   }
 
-  async delete(id: number): Promise<Room | null> {
+  async delete(id: string): Promise<Room | null> {
     return await this.roomModel.findByIdAndRemove(id).exec();
   }
 }
