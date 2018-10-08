@@ -3,15 +3,10 @@ import {
   SubscribeMessage,
   WsResponse,
   WebSocketServer,
-  WsException,
   OnGatewayConnection,
   OnGatewayDisconnect
 } from '@nestjs/websockets';
-import * as WebSocket from 'ws';
-import * as io from 'socket.io';
 import { Observable } from 'rxjs';
-import 'rxjs/add/observable/from';
-import 'rxjs/add/operator/map';
 
 import { JwtService } from '../auth/jwt/jwt.service';
 import { User } from '../users/interfaces/user.interface';
@@ -29,73 +24,55 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) { }
 
   async handleConnection(socket) {
-    const roomId = socket.handshake.query.room;
     const user: User = await this.jwtService.verify(
       socket.handshake.query.token,
       true
     );
 
-    socket.join(roomId);
-
     this.connectedUsers = [... this.connectedUsers, String(user._id)];
-
-    const messages = await this.roomService.findMessages(roomId, 25);
-
-    // Send last messages to the connected user
-    socket.emit('message', messages);
-
-    // socket.broadcast.emit('userConnected', user);
+    
+    // Send list of connected users
+    socket.broadcast.emit('users', this.connectedUsers);
   }
 
   async handleDisconnect(socket) {
-    const roomId = socket.handshake.query.room;
     const user: User = await this.jwtService.verify(
       socket.handshake.query.token,
       true
     );
     const userPos = this.connectedUsers.indexOf(String(user._id));
 
-    socket.leave(roomId);
     if (userPos > -1) {
       this.connectedUsers = [...this.connectedUsers.slice(0, userPos), ...this.connectedUsers.slice(userPos + 1)]
     }
+
+    // Sends the new list of connected users
+    socket.broadcast.emit('users', this.connectedUsers);
   }
 
   @SubscribeMessage('message')
-  onMessage(client, data): Observable<WsResponse<string>> {
-    const room = client.handshake.query.room;
-    const event = 'message';
+  async onMessage(client, data: any) {
+    const event: string = 'message';
+    const result = data[0];
+    
+    await this.roomService.addMessage(result.message, result.room);
+    client.broadcast.to(result.room).emit(event, result.message);
 
-    client.broadcast.to(room).emit('message', data);
-
-    this.roomService.addMessage(data, room);
-
-    return Observable.create(observer => observer.next({ event, data }));
+    return Observable.create(observer => observer.next({ event, data: result.message }));
   }
 
   @SubscribeMessage('join')
-  onRoomConnection(client, data): void {
-    const room = client.handshake.query.room;
-    console.log('join', room);
-    client.join(room);
+  async onRoomJoin(client, data: any): Promise<any> {
+    client.join(data[0]);
+
+    const messages = await this.roomService.findMessages(data, 25);
+
+    // Send last messages to the connected user
+    client.emit('message', messages);
   }
 
   @SubscribeMessage('leave')
-  onRoomLeave(client, data): void {
-    const room = client.handshake.query.room;
-    console.log('leave', room);
-    client.leave(room);
-  }
-
-  @SubscribeMessage('messages')
-  onMessageRoom(client, data): Observable<WsResponse<string>> {
-    const room = client.handshake.query.room;
-    const event = `message/${client.room.id}`;
-    console.log(data);
-    console.log('--------');
-    console.log('Room', room);
-    client.to(room).emit(data);
-
-    return Observable.create(observer => observer.next({ event, data }));
+  onRoomLeave(client, data: any): void {
+    client.leave(data[0]);
   }
 }

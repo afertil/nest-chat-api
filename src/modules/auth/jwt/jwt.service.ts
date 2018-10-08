@@ -41,7 +41,7 @@ export class JwtService {
    * Validates the token
    *
    * @param {string} token - The JWT token to validate
-   * @param {boolean} isWs - True tohandle WS exception instead of HTTP exception (default: false)
+   * @param {boolean} isWs - True to handle WS exception instead of HTTP exception (default: false)
    */
   async verify(token: string, isWs: boolean = false): Promise<User | null> {
     try {

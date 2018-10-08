@@ -32,7 +32,7 @@ export class RoomsService {
       const userRoom = new this.roomModel({ _id: id, name: id, is_user: true });
       room = await this.create(userRoom);
     }
-    console.log(room);
+
     return room.messages;
   }
 
@@ -44,7 +44,7 @@ export class RoomsService {
     return await this.roomModel
       .findById(id)
       .slice('messages', limit)
-      .populate('messages.user', { _id: 1, username: 1, email: 1 })
+      // .populate('messages.user', { _id: 1, username: 1, email: 1 })
       .exec();
   }
 
