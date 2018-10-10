@@ -14,14 +14,15 @@ import { RoomsService } from '../rooms/rooms.service';
 
 @WebSocketGateway(1080, { namespace: 'rooms' })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  @WebSocketServer() server;
+  @WebSocketServer()
+  server;
 
   connectedUsers: string[] = [];
 
   constructor(
     private jwtService: JwtService,
     private roomService: RoomsService
-  ) { }
+  ) {}
 
   async handleConnection(socket) {
     const user: User = await this.jwtService.verify(
@@ -29,10 +30,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       true
     );
 
-    this.connectedUsers = [... this.connectedUsers, String(user._id)];
-    
+    this.connectedUsers = [...this.connectedUsers, String(user._id)];
+
     // Send list of connected users
-    socket.broadcast.emit('users', this.connectedUsers);
+    this.server.emit('users', this.connectedUsers);
   }
 
   async handleDisconnect(socket) {
@@ -43,22 +44,27 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const userPos = this.connectedUsers.indexOf(String(user._id));
 
     if (userPos > -1) {
-      this.connectedUsers = [...this.connectedUsers.slice(0, userPos), ...this.connectedUsers.slice(userPos + 1)]
+      this.connectedUsers = [
+        ...this.connectedUsers.slice(0, userPos),
+        ...this.connectedUsers.slice(userPos + 1)
+      ];
     }
 
     // Sends the new list of connected users
-    socket.broadcast.emit('users', this.connectedUsers);
+    this.server.emit('users', this.connectedUsers);
   }
 
   @SubscribeMessage('message')
   async onMessage(client, data: any) {
     const event: string = 'message';
     const result = data[0];
-    
+
     await this.roomService.addMessage(result.message, result.room);
     client.broadcast.to(result.room).emit(event, result.message);
 
-    return Observable.create(observer => observer.next({ event, data: result.message }));
+    return Observable.create(observer =>
+      observer.next({ event, data: result.message })
+    );
   }
 
   @SubscribeMessage('join')
